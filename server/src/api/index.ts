@@ -1,7 +1,8 @@
 import express, { Request, Response, NextFunction, Application } from 'express';
 import cors from 'cors';
-import cookieParser from 'cookie-parser';import connectDB from './config/db';
-import taskRoutes from './routes/taskRoutes';
+import cookieParser from 'cookie-parser';
+import connectDB from '../config/db';
+import taskRoutes from '../routes/taskRoutes';
 import dotenv from 'dotenv';
 
 dotenv.config();
