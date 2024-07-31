@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useState } from "react";
-import { Button, DatePicker, Divider, Input, Select } from "antd";
+import { Button, Divider, Input, Select } from "antd";
 import { RxCross2 } from "react-icons/rx";
 import CustomButton, { Position } from "@/components/button";
 import { GoShareAndroid } from "react-icons/go";
@@ -19,8 +19,9 @@ import TextArea from "antd/es/input/TextArea";
 import { z } from "zod";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { format, parse } from "date-fns";
 import { createTask } from "@/utils/api";
+import DatePicker from "./date-picker";
+import { DateTime } from 'luxon';
 
 interface Props {
   onClose: () => void;
@@ -299,8 +300,8 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
                   placeholder="Select date"
                   className="w-40"
                   status={error && "error"}
-                  onChange={()=>setValue('deadline',"2002-09-22",{shouldDirty: true})}
-                  value={value}
+                  onChange={(v) => v && onChange(v.toUTC().toISO())}
+                  value={value ? DateTime.fromISO(value) : null}
                 />
                 {error && (
                   <p
