@@ -3,7 +3,13 @@ import { AddTaskInput } from "@/components/ui/dashboard/task-mutation";
 const API_URL = process.env.API_URL ||'';
 
 export const fetchTasks = async (): Promise<AddTaskInput[]> => {
-  const response = await fetch(`${API_URL}/api/tasks`);
+  const response = await fetch(`${API_URL}/api/tasks`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    cache:"no-store",
+  });
   if (!response.ok) {
     throw new Error('Failed to fetch tasks');
   }

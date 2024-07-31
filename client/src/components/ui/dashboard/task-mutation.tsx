@@ -64,9 +64,9 @@ interface CustomProperties {
 export interface AddTaskInput {
   title: string;
   status: string;
-  priority: string;
+  priority?: string;
   deadline: string;
-  description: string;
+  description?: string;
   customProperties?: CustomProperties[];
 }
 
@@ -98,12 +98,9 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
       }),
     priority: z
       .nativeEnum(Priority, { required_error: "Priority is required" })
-      .nullable()
-      .refine((val) => val !== null, {
-        message: "Priority cannot be null",
-      }),
-    deadline: z.object({}),
-    description: z.string().min(1, { message: "Description is required" }),
+      .nullable().optional(),
+    deadline: z.string(),
+    description: z.string().optional(),
     customProperties: z.array(customPropertyValidationSchema).optional(),
   });
 
@@ -271,17 +268,7 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
                   options={priority}
                   className="w-40"
                   value={value || null}
-                  status={error && "error"}
                 />
-                {error && (
-                  <p
-                    className={
-                      "flex text-sm items-center h-8 pl-4 text-red-600"
-                    }
-                  >
-                    Required*
-                  </p>
-                )}
               </div>
             );
           }}
@@ -299,9 +286,12 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
                 <DatePicker
                   placeholder="Select date"
                   className="w-40"
+                  style={{ width: "100%" }}
                   status={error && "error"}
                   onChange={(v) => v && onChange(v.toUTC().toISO())}
                   value={value ? DateTime.fromISO(value) : null}
+                  format={"DD/MM/YYYY HH:mm"}
+                  showTime={{ format: "HH:mm" }}
                 />
                 {error && (
                   <p
@@ -331,17 +321,7 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
                   placeholder="Description"
                   value={value}
                   onChange={onChange}
-                  status={error && "error"}
                 />
-                {error && (
-                  <p
-                    className={
-                      "flex text-sm items-center h-8 pl-4 text-red-600"
-                    }
-                  >
-                    Required*
-                  </p>
-                )}
               </div>
             );
           }}
