@@ -21,9 +21,9 @@ const TaskBoxBody:FC<Props> = ({task}) => {
         {task.title}
       </p>
       <p className="text-sm font-normal text-[#797979] mt-1 mb-2.5">
-        {task.description}.
+        {task?.description}.
       </p>
-      <Tag color={priorityColors[task.priority as string]} className="rounded-lg py-0.5 px-1.5">{task.priority}</Tag>
+      <Tag color={ task.priority === "Urgent" ? "#FF6B6B": task.priority ==="Medium" ? "#FFA235" : "#FF6B6B"} className="rounded-lg py-0.5 px-1.5">{task?.priority}</Tag>
       <div className="flex justify-start items-center my-3">
       <MdOutlineAccessTime size={22}/>
         <p className={`ml-2`}>{DateTime.fromISO(task.deadline).toLocaleString()}</p>
