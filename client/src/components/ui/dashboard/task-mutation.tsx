@@ -81,7 +81,6 @@ export const addTaskInput: AddTaskInput = {
 const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
   const [isZoomOut, setZoomOut] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [tasks, setTasks] = useState<AddTaskInput[]>([]);
 
   const customPropertyValidationSchema = z.object({
     lebel: z.string().min(1, { message: "Lebel is required" }),
@@ -118,7 +117,6 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
     handleSubmit,
     formState: { isDirty, errors },
     reset,
-    watch,
   } = form;
   const taskCustomProperties = useFieldArray({
     control,
@@ -301,9 +299,8 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
                   placeholder="Select date"
                   className="w-40"
                   status={error && "error"}
-                  onChange={()=>onChange("2002-09-22")}
-                  value={value || null}
-                  format={"YYYY-MM-DD"}
+                  onChange={()=>setValue('deadline',"2002-09-22",{shouldDirty: true})}
+                  value={value}
                 />
                 {error && (
                   <p
