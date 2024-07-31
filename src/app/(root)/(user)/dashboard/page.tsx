@@ -55,7 +55,6 @@ const Dashboard = () => {
       setTasks(tasks);
     } catch (error) {
       console.error("Error creating task:", error);
-      alert("Failed to create task. Please try again.");
     }
   };
 
@@ -86,7 +85,7 @@ const Dashboard = () => {
           suffix={<RiSearchLine />}
         />
         <div className="flex justify-between items-center">
-          {buttonActions.map(({ lebel, icon }) => (
+          {buttonActions.map(({ lebel, icon }, idx) => (
             <CustomButton
               iconPosition={Position.END}
               title={lebel}
@@ -95,6 +94,7 @@ const Dashboard = () => {
               color="#797979"
               customStyles="w-full h-10 mr-4"
               onClick={() => {}}
+              key={idx}
             />
           ))}
           <CustomButton

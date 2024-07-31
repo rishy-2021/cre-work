@@ -84,7 +84,7 @@ const LoginForm = ({ toast }: any) => {
           </Button> */}
         </div>
         <p className="mx-auto text-sm mt-2">
-          Don't have an account? Create a
+          Don&apos;t have an account? Create a
           <span className="text-violet-700 pointer"><Link href={"/signup"}> new account</Link></span>.
         </p>
       </div>

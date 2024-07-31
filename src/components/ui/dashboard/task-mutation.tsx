@@ -126,12 +126,9 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
   });
 
   const onSubmit = async (formData: AddTaskInput) => {
-    const { deadline, ...rest } = formData;
-    console.log(watch('deadline'))
-    const dateSting = format(watch("deadline"), "yyyy-MM-dd");
     setIsLoading(true);
     try {
-      const newTask = await createTask({ ...rest, dateSting });
+      const newTask = await createTask(formData);
       if (newTask) {
         onClose();
       }
@@ -304,7 +301,7 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
                   placeholder="Select date"
                   className="w-40"
                   status={error && "error"}
-                  onChange={onChange}
+                  onChange={()=>onChange("2002-09-22")}
                   value={value || null}
                   format={"YYYY-MM-DD"}
                 />

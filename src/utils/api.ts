@@ -1,9 +1,9 @@
 import { AddTaskInput } from "@/components/ui/dashboard/task-mutation";
 
-const API_URL = '/api/tasks';
+const API_URL = process.env.API_URL ||'';
 
 export const fetchTasks = async (): Promise<AddTaskInput[]> => {
-  const response = await fetch(API_URL);
+  const response = await fetch(`${API_URL}/api/tasks`);
   if (!response.ok) {
     throw new Error('Failed to fetch tasks');
   }
@@ -11,11 +11,13 @@ export const fetchTasks = async (): Promise<AddTaskInput[]> => {
 };
 
 export const createTask = async (task: Partial<AddTaskInput>): Promise<AddTaskInput> => {
-  const response = await fetch("http://localhost:3001/api/tasks/add", {
+  console.log(task, "-----------")
+  const response = await fetch(`${API_URL}/api/tasks/add`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
+    cache:"no-store",
     body: JSON.stringify(task),
   });
   if (!response.ok) {
@@ -26,7 +28,7 @@ export const createTask = async (task: Partial<AddTaskInput>): Promise<AddTaskIn
 };
 
 export const updateTask = async (id: string, task: Partial<AddTaskInput>): Promise<AddTaskInput> => {
-  const response = await fetch(`${API_URL}/${id}`, {
+  const response = await fetch(`${API_URL}/api/task/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
