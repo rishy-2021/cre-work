@@ -6,7 +6,6 @@ const DatePicker = generatePicker<DateTime>({
   ...luxonGenerateConfig,
   locale: {
     ...luxonGenerateConfig.locale,
-    format: (_, d) => d.toFormat('dd/MM/yyyy')
   }
 });
 

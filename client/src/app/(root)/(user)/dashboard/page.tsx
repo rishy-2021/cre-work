@@ -53,6 +53,7 @@ const Dashboard = () => {
     try {
       const tasks = await fetchTasks();
       setTasks(tasks);
+      console.log(tasks)
     } catch (error) {
       console.error("Error creating task:", error);
     }
@@ -107,6 +108,7 @@ const Dashboard = () => {
             color="white"
             onClick={() => {
               setOpen(true);
+              setAction("");
             }}
           />
         </div>
@@ -114,9 +116,10 @@ const Dashboard = () => {
       <TaskContainer
         tasks={tasks}
         onOpen={(action) => {
-          setOpen(true);
           setAction(action);
+          setOpen(true);
         }}
+        handleTaskUpdate={(tasks)=> setTasks(tasks)}
       />
       <CustomDrawer
         open={open}
@@ -127,6 +130,7 @@ const Dashboard = () => {
         }}
         onWidthChange={(width) => setWidth(width)}
         action={action}
+        key={action}
       />
     </div>
   );

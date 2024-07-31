@@ -1,28 +1,59 @@
-import { Tag } from "antd";
+"use client"
 import React, { FC } from "react";
-import { MdOutlineAccessTime } from "react-icons/md";
+import { Droppable, Draggable } from "react-beautiful-dnd";
+import { BsFilterRight } from "react-icons/bs";
+import { FiPlus } from "react-icons/fi";
+import CustomButton, { Position } from "@/components/button";
 import { AddTaskInput } from "./task-mutation";
+import TaskBoxBody from "./task-box-body";
 
 interface Props {
-  task:AddTaskInput
+  onOpen: (action: string) => void;
+  tasks: AddTaskInput[];
+  droppableId: string;
+  columnTitle: string;
 }
 
-const TaskBox:FC<Props> = ({task}) => {
+const TaskBox: FC<Props> = ({ onOpen, tasks, droppableId, columnTitle }) => {
   return (
-    <div className="flex flex-col border bg-[#F9F9F9] rounded-lg justify-center items-start p-4 mb-4">
-      <p className="text-base font-medium text-[#606060]">
-        {task.title}
-      </p>
-      <p className="text-sm font-normal text-[#797979] mt-1 mb-2.5">
-        {task.description}.
-      </p>
-      <Tag color="#FF6B6B">{task.priority}</Tag>
-      <div className="flex justify-start items-center my-3">
-      <MdOutlineAccessTime size={22}/>
-        <p className="text-[#606060] ml-2">{task.deadline}</p>
-      </div>
-      <p className="text-sm text-[#797979] ml-1.5">1 hr ago</p>
-    </div>
+    <Droppable droppableId={droppableId}>
+      {(provided) => (
+        <div
+          ref={provided.innerRef}
+          {...provided.droppableProps}
+          className="flex flex-col w-[24.2%] bg-gray-100 p-4 rounded-lg"
+        >
+          <div className="flex justify-between items-center mb-4">
+            <p className="text-xl text-[#555555]">{columnTitle}</p>
+            <BsFilterRight size={24} />
+          </div>
+          {tasks.map((task, idx) => (
+            <Draggable key={Number(idx)} draggableId={task?._id || ''} index={idx}>
+              {(provided, snapshot) => (
+                <div
+                  ref={provided.innerRef}
+                  {...provided.draggableProps}
+                  {...provided.dragHandleProps}
+                  className={`mb-2 p-2 bg-white rounded shadow-sm ${snapshot.isDragging ? 'bg-gray-200' : ''}`}
+                >
+                  <TaskBoxBody task={task} />
+                </div>
+              )}
+            </Draggable>
+          ))}
+          {provided.placeholder}
+          {/* <CustomButton
+            iconPosition={Position.END}
+            title="Add new"
+            icon={<FiPlus color="white" size={22} />}
+            bgColor={`linear-gradient(180deg, #3A3A3A 0%, #202020 100%)`}
+            customStyles="w-full h-10 flex justify-between"
+            color="white"
+            onClick={() => onOpen(columnTitle)}
+          /> */}
+        </div>
+      )}
+    </Droppable>
   );
 };
 

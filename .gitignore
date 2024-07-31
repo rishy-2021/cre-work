@@ -12,8 +12,9 @@
 /server/.env
 
 # next.js
-/.next/
+/client/.next/
 /out/
+/server/dist/
 
 # production
 /build

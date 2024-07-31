@@ -5,12 +5,13 @@ import CustomButton, { Position } from "@/components/button";
 import { GoShareAndroid } from "react-icons/go";
 import { FaRegStar } from "react-icons/fa6";
 import {
+  MdDelete,
   MdOutlineCreateNewFolder,
   MdOutlineDashboardCustomize,
   MdOutlineZoomOutMap,
   MdZoomInMap,
 } from "react-icons/md";
-import { AiOutlineSun } from "react-icons/ai";
+import { AiOutlineDelete, AiOutlineSun } from "react-icons/ai";
 import { BsExclamationDiamond } from "react-icons/bs";
 import { CiCalendar } from "react-icons/ci";
 import { PiPencilSimpleLight } from "react-icons/pi";
@@ -22,6 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { createTask } from "@/utils/api";
 import DatePicker from "./date-picker";
 import { DateTime } from 'luxon';
+import { FiDelete } from "react-icons/fi";
 
 interface Props {
   onClose: () => void;
@@ -62,6 +64,7 @@ interface CustomProperties {
 }
 
 export interface AddTaskInput {
+  _id?:string;
   title: string;
   status: string;
   priority?: string;
@@ -97,9 +100,8 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
         message: "Status cannot be null",
       }),
     priority: z
-      .nativeEnum(Priority, { required_error: "Priority is required" })
-      .nullable().optional(),
-    deadline: z.string(),
+      .nativeEnum(Priority).optional(),
+    deadline: z.string().min(1,{message:"Required*"}),
     description: z.string().optional(),
     customProperties: z.array(customPropertyValidationSchema).optional(),
   });
@@ -127,6 +129,7 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
       const newTask = await createTask(formData);
       if (newTask) {
         onClose();
+        reset({});
       }
     } catch (error) {
       console.error("Error creating task:", error);
@@ -286,12 +289,10 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
                 <DatePicker
                   placeholder="Select date"
                   className="w-40"
-                  style={{ width: "100%" }}
                   status={error && "error"}
                   onChange={(v) => v && onChange(v.toUTC().toISO())}
                   value={value ? DateTime.fromISO(value) : null}
-                  format={"DD/MM/YYYY HH:mm"}
-                  showTime={{ format: "HH:mm" }}
+                  format={"yyyy-MM-dd"}
                 />
                 {error && (
                   <p
@@ -328,7 +329,7 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
           name="description"
         />
         {taskCustomProperties.fields.map(({ lebel, value, id }, index) => (
-          <div className="flex my-5" key={id}>
+          <div className="flex my-5 items-center" key={id}>
             <Controller
               control={control}
               render={({
@@ -386,6 +387,7 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
               }}
               name={`customProperties.${index}.value`}
             />
+            <Button icon={<AiOutlineDelete />} className="ml-5" size="small" onClick={()=> taskCustomProperties.remove(index)} />
           </div>
         ))}
         <div
@@ -403,6 +405,7 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
           className="w-56 text-white text-lg font-medium mt-7"
           icon={<MdOutlineCreateNewFolder size={20} />}
           size="large"
+          loading={isLoading}
           onClick={handleSubmit(onSubmit)}
         >
           Save task
