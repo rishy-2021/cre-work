@@ -3,19 +3,23 @@ import React, { FC } from "react";
 import { BsFilterRight } from "react-icons/bs";
 import { FiPlus } from "react-icons/fi";
 import TaskBox from "./task-box";
+import { AddTaskInput } from "./task-mutation";
 
 interface Props {
-  onOpen: (action:string) => void;
+  onOpen: (action: string) => void;
+  tasks: AddTaskInput[];
 }
 
-const ToDo:FC<Props> = ({ onOpen }) => {
+const ToDo: FC<Props> = ({ onOpen, tasks }) => {
   return (
     <div className="flex flex-col w-[24.2%]">
       <div className="flex justify-between items-center mb-4">
         <p className="text-xl text-[#555555]">To do</p>
         <BsFilterRight size={24} />
       </div>
-      <TaskBox />
+      {tasks.map((task, idx) => (
+        <TaskBox task={task} key={idx}/>
+      ))}
       <CustomButton
         iconPosition={Position.END}
         title="Add new"
@@ -23,7 +27,7 @@ const ToDo:FC<Props> = ({ onOpen }) => {
         bgColor={`linear-gradient(180deg, #3A3A3A 0%, #202020 100%)`}
         customStyles="w-full h-10 flex justify-between"
         color="white"
-        onClick={()=>onOpen("To do")}
+        onClick={() => onOpen("To do")}
       />
     </div>
   );

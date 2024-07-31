@@ -1,6 +1,6 @@
 import { Drawer } from 'antd'
 import React, { FC } from 'react'
-import AddNewTask from './task-mutation'
+import TaskMutation from './task-mutation'
 
 interface Props {
     open: boolean;
@@ -13,7 +13,7 @@ interface Props {
 const CustomDrawer:FC<Props> = ({open, width, onClose, onWidthChange, action}) => {
   return (
     <Drawer closable={false} onClose={onClose} open={open} width={width}>
-    <AddNewTask
+    <TaskMutation
       onClose={onClose}
       onChangeWidth={onWidthChange}
       taskStatus={action}

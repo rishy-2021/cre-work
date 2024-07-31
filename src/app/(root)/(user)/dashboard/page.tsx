@@ -1,11 +1,11 @@
 "use client";
 import CustomButton, { Position } from "@/components/button";
-import AddNewTask from "@/components/ui/dashboard/task-mutation";
+import AddNewTask, { AddTaskInput } from "@/components/ui/dashboard/task-mutation";
 import CustomDrawer from "@/components/ui/dashboard/drawer";
 import FeatureBox from "@/components/ui/dashboard/feature-box";
 import TaskContainer from "@/components/ui/dashboard/task-container";
 import { Drawer, Input } from "antd";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CiFilter } from "react-icons/ci";
 import { FaCirclePlus } from "react-icons/fa6";
 import { GoShareAndroid } from "react-icons/go";
@@ -13,6 +13,7 @@ import { LuCalendar } from "react-icons/lu";
 import { RiSearchLine } from "react-icons/ri";
 import { SlQuestion } from "react-icons/sl";
 import { TbAutomaticGearbox } from "react-icons/tb";
+import { fetchTasks } from "@/utils/api";
 
 const buttonActions = [
   { lebel: "Calendar", icon: <LuCalendar color="gray" size={22} /> },
@@ -46,6 +47,21 @@ const Dashboard = () => {
   const [open, setOpen] = useState(false);
   const [width, setWidth] = useState("40%");
   const [action, setAction] = useState("");
+  const [tasks, setTasks] = useState<AddTaskInput[]>([]);
+
+  const handleFetchTasks = async () => {
+    try {
+      const tasks = await fetchTasks();
+      setTasks(tasks);
+    } catch (error) {
+      console.error("Error creating task:", error);
+      alert("Failed to create task. Please try again.");
+    }
+  };
+
+  useEffect(()=>{
+    handleFetchTasks()
+  },[])
 
   return (
     <div className="bg-[#F7F7F7] h-screen w-full py-5 px-4">
@@ -96,6 +112,7 @@ const Dashboard = () => {
         </div>
       </div>
       <TaskContainer
+        tasks={tasks}
         onOpen={(action) => {
           setOpen(true);
           setAction(action);
@@ -104,7 +121,10 @@ const Dashboard = () => {
       <CustomDrawer
         open={open}
         width={width}
-        onClose={() => setOpen(false)}
+        onClose={() => {
+          setOpen(false)
+          handleFetchTasks()
+        }}
         onWidthChange={(width) => setWidth(width)}
         action={action}
       />

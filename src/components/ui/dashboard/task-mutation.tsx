@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Button, DatePicker, Divider, Input, Select } from "antd";
 import { RxCross2 } from "react-icons/rx";
 import CustomButton, { Position } from "@/components/button";
@@ -19,6 +19,8 @@ import TextArea from "antd/es/input/TextArea";
 import { z } from "zod";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format, parse } from "date-fns";
+import { createTask } from "@/utils/api";
 
 interface Props {
   onClose: () => void;
@@ -58,11 +60,11 @@ interface CustomProperties {
   value: string;
 }
 
-interface AddTaskInput {
+export interface AddTaskInput {
   title: string;
   status: string;
   priority: string;
-  deadLine: string;
+  deadline: string;
   description: string;
   customProperties?: CustomProperties[];
 }
@@ -71,13 +73,15 @@ export const addTaskInput: AddTaskInput = {
   title: "",
   status: "",
   priority: "",
-  deadLine: "",
+  deadline: "",
   description: "",
   customProperties: [],
 };
 
 const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
   const [isZoomOut, setZoomOut] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [tasks, setTasks] = useState<AddTaskInput[]>([]);
 
   const customPropertyValidationSchema = z.object({
     lebel: z.string().min(1, { message: "Lebel is required" }),
@@ -98,12 +102,12 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
       .refine((val) => val !== null, {
         message: "Priority cannot be null",
       }),
-    deadLine: z.string().min(1, { message: "Deadline is required" }),
+    deadline: z.object({}),
     description: z.string().min(1, { message: "Description is required" }),
     customProperties: z.array(customPropertyValidationSchema).optional(),
   });
 
-  const form = useForm({
+  const form = useForm<AddTaskInput>({
     defaultValues: { ...addTaskInput },
     resolver: zodResolver(taskValidationSchema),
   });
@@ -113,13 +117,37 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
     setValue,
     handleSubmit,
     formState: { isDirty, errors },
-    register,
     reset,
+    watch,
   } = form;
   const taskCustomProperties = useFieldArray({
     control,
     name: "customProperties",
   });
+
+  const onSubmit = async (formData: AddTaskInput) => {
+    const { deadline, ...rest } = formData;
+    console.log(watch('deadline'))
+    const dateSting = format(watch("deadline"), "yyyy-MM-dd");
+    setIsLoading(true);
+    try {
+      const newTask = await createTask({ ...rest, dateSting });
+      if (newTask) {
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error creating task:", error);
+      alert("Failed to create task. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (taskStatus) {
+      reset({ ...addTaskInput, status: taskStatus });
+    }
+  }, []);
 
   return (
     <div className="flex flex-col">
@@ -131,6 +159,7 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
             onClick={() => {
               onClose();
               onChangeWidth("45%");
+              reset();
             }}
           />
           <Button
@@ -269,14 +298,15 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
               <div className="flex my-5">
                 <div className="flex items-center w-1/3 px-3">
                   <CiCalendar size={20} />
-                  <p className="ml-7">Deadline</p>
+                  <p className="ml-7">deadline</p>
                 </div>
                 <DatePicker
-                  onChange={onChange}
                   placeholder="Select date"
                   className="w-40"
-                  value={value || null}
                   status={error && "error"}
+                  onChange={onChange}
+                  value={value || null}
+                  format={"YYYY-MM-DD"}
                 />
                 {error && (
                   <p
@@ -290,7 +320,7 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
               </div>
             );
           }}
-          name="deadLine"
+          name="deadline"
         />
         <Controller
           control={control}
@@ -322,20 +352,64 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
           }}
           name="description"
         />
-        {taskCustomProperties.fields.map(({ lebel, value }) => (
-          <div className="flex my-5">
-            <div className="flex items-center w-1/3 px-3">
-              <MdOutlineDashboardCustomize size={20} color="gray" />
-              <Input
-                className="outline-0 border-0 w-24 ml-5"
-                placeholder="lebel"
-                value={lebel}
-              />
-            </div>
-            <Input
-              className="outline-0 border-0 w-40"
-              placeholder="value"
-              value={value}
+        {taskCustomProperties.fields.map(({ lebel, value, id }, index) => (
+          <div className="flex my-5" key={id}>
+            <Controller
+              control={control}
+              render={({
+                field: { onChange, value },
+                fieldState: { error },
+              }) => {
+                return (
+                  <div className="flex items-center w-1/3 px-3" key={id}>
+                    <MdOutlineDashboardCustomize size={20} color="gray" />
+                    <Input
+                      className="outline-0 border-0 w-32 ml-5"
+                      placeholder="lebel"
+                      value={value}
+                      onChange={onChange}
+                      status={error && "error"}
+                      suffix={
+                        error && (
+                          <p
+                            className={
+                              "flex text-xs items-start pl-4 text-red-600"
+                            }
+                          >
+                            Required*
+                          </p>
+                        )
+                      }
+                    />
+                  </div>
+                );
+              }}
+              name={`customProperties.${index}.lebel`}
+            />
+            <Controller
+              control={control}
+              render={({
+                field: { onChange, value },
+                fieldState: { error },
+              }) => {
+                return (
+                  <Input
+                    className="outline-0 border-0 w-40"
+                    placeholder="value"
+                    value={value}
+                    onChange={onChange}
+                    status={error && "error"}
+                    suffix={
+                      error && (
+                        <p className={"text-xs items-center pl-4 text-red-600"}>
+                          Required*
+                        </p>
+                      )
+                    }
+                  />
+                );
+              }}
+              name={`customProperties.${index}.value`}
             />
           </div>
         ))}
@@ -354,7 +428,7 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
           className="w-56 text-white text-lg font-medium mt-7"
           icon={<MdOutlineCreateNewFolder size={20} />}
           size="large"
-          onClick={handleSubmit(() => {})}
+          onClick={handleSubmit(onSubmit)}
         >
           Save task
         </Button>
