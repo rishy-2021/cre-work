@@ -49,11 +49,24 @@ const Dashboard = () => {
   const [action, setAction] = useState("");
   const [tasks, setTasks] = useState<AddTaskInput[]>([]);
 
+  const renameIdField = (arr: any[]) => {
+    return arr.map(item => {
+      const { _id, ...rest } = item;
+      return { id: _id, ...rest };
+    });
+  };
+
+
   const handleFetchTasks = async () => {
     try {
-      const tasks = await fetchTasks();
-      setTasks(tasks);
-      console.log(tasks)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        cache:"no-store",
+      });
+      setTasks(renameIdField(await response.json()));
     } catch (error) {
       console.error("Error creating task:", error);
     }
@@ -119,7 +132,7 @@ const Dashboard = () => {
           setAction(action);
           setOpen(true);
         }}
-        handleTaskUpdate={(tasks)=> setTasks(tasks)}
+        handleTaskUpdate={(updatedTasks)=>setTasks(updatedTasks)}
       />
       <CustomDrawer
         open={open}
