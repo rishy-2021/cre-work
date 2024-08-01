@@ -6,8 +6,15 @@ import { SignupFormData } from "@/types/auth/types";
 import { useState } from "react";
 import FieldErrorText from "../FieldErrorText";
 import { Button, Input } from "antd";
-import { signUpSchema } from "@/schema/sign-up-from-schema";
 import Link from "next/link";
+import { ZodType, z } from "zod";
+
+const signUpSchema: ZodType<SignupFormData> = z
+  .object({
+    name:z.string().min(2, "Please enter a vaild name"),
+    email: z.string().email(),
+    password: z.string().min(8, "Password must contain at least 8 characters").max(128)
+  });
 
 const SignUpForm = () => {
   const {
@@ -17,7 +24,6 @@ const SignUpForm = () => {
   } = useForm<SignupFormData>({ resolver: zodResolver(signUpSchema) });
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [isRemember, setIsRemember] = useState(false);
 
   const [passwordShow, setPasswordShow] = useState(false);
 
@@ -80,6 +86,7 @@ const SignUpForm = () => {
               background: `linear-gradient(180deg, #4C38C2 0%, #2F2188 100%),
               linear-gradient(0deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3))`,
             }}
+            onClick={handleSubmit(()=>router.push("/dashboard"))}
           >
             Sign up
           </Button>

@@ -1,25 +1,30 @@
 "use client";
 import styles from "@/styles/signup.module.css";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "@/schema/login-form-schema";
 import { useRouter } from "next/navigation";
 import { LoginFormData } from "@/types/auth/types";
 import { useState } from "react";
 import FieldErrorText from "../FieldErrorText";
 import { Button, Input } from "antd";
 import Link from "next/link";
+import { ZodType, z } from "zod";
 
 const LoginForm = ({ toast }: any) => {
+
+  const loginSchema: ZodType<LoginFormData> = z
+  .object({
+    email: z.string().email(),
+    password: z.string().min(8).max(128)
+  });
   const {
     register,
     handleSubmit,
+    control,
     formState: { isValid, errors },
   } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [isRemember, setIsRemember] = useState(false);
-
   const [passwordShow, setPasswordShow] = useState(false);
 
   const handleClick = () => {
@@ -39,27 +44,67 @@ const LoginForm = ({ toast }: any) => {
         </p>
       </div>
       <div className="inputs flex flex-col gap-y-3">
-        <Input
-          type="email"
-          {...register("email")}
-          placeholder="Your Email"
-          size={"large"}
-          className="bg-gray-100 mb-2"
-        />
-        {errors.email && (
-          <FieldErrorText>{errors.email.message}</FieldErrorText>
-        )}
-        <Input
-          type="password"
-          {...register("password")}
-          placeholder="Password"
-          size={"large"}
-          className="bg-gray-100"
-        />
-        {errors.password && (
-          <FieldErrorText>{errors.password.message}</FieldErrorText>
-        )}
-
+      <Controller
+        control={control}
+        render={({ field: { onChange, value }, fieldState: { error } }) => {
+          return (
+            <>
+              <Input
+                 type="email"
+                 {...register("email")}
+                 placeholder="Your Email"
+                 size={"large"}
+                 className="bg-gray-100 mb-2"
+                status={error && "error"}
+                onChange={onChange}
+                value={value}
+                suffix={
+                  error && (
+                    <p
+                      className={
+                        "flex text-sm items-start justify-start h-full px-1 text-red-600"
+                      }
+                    >
+                      Required*
+                    </p>
+                  )
+                }
+              />
+            </>
+          );
+        }}
+        name="email"
+      />
+       <Controller
+        control={control}
+        render={({ field: { onChange, value }, fieldState: { error } }) => {
+          return (
+            <>
+              <Input
+                  type="password"
+                  placeholder="Password"
+                  size={"large"}
+                  className="bg-gray-100"
+                status={error && "error"}
+                onChange={onChange}
+                value={value}
+                suffix={
+                  error && (
+                    <p
+                      className={
+                        "flex text-sm items-start justify-start h-full px-1 text-red-600"
+                      }
+                    >
+                      Required*
+                    </p>
+                  )
+                }
+              />
+            </>
+          );
+        }}
+        name="password"
+      />
         <div className="flex items-center justify-between">
           <Button
             loading={isLoading}
@@ -72,16 +117,10 @@ const LoginForm = ({ toast }: any) => {
               background: `linear-gradient(180deg, #4C38C2 0%, #2F2188 100%),
               linear-gradient(0deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3))`,
             }}
+            onClick={handleSubmit(()=> router.replace("/dashboard"))}
           >
             Login
           </Button>
-          {/* <Button
-            type="primary"
-            onClick={() => router.push("/forget-password")}
-            className="text-gray-600"
-          >
-            Forget Password
-          </Button> */}
         </div>
         <p className="mx-auto text-sm mt-2">
           Don&apos;t have an account? Create a
