@@ -1,6 +1,6 @@
 import { AddTaskInput } from "@/components/ui/dashboard/task-mutation";
 
-const API_URL = process.env.API_URL ||'';
+const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export const fetchTasks = async (): Promise<AddTaskInput[]> => {
   const response = await fetch(`${API_URL}/api/tasks`, {
@@ -34,7 +34,7 @@ export const createTask = async (task: Partial<AddTaskInput>): Promise<AddTaskIn
 };
 
 export const updateTask = async (id: string, task: Partial<AddTaskInput>): Promise<AddTaskInput> => {
-  const response = await fetch(`${API_URL}/api/task/${id}`, {
+  const response = await fetch(`${API_URL}/api/tasks/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
