@@ -15,9 +15,9 @@ const corsOptions = {
   origin: ["http://localhost:3000", "https://www.cre-work-rnox.vercel.app", "https://cre-work-rnox.vercel.app"],
   credentials: true,
 };
-
-app.use(cookieParser());
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
