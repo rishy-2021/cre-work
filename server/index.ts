@@ -12,21 +12,14 @@ const app: Application = express();
 
 // CORS configuration
 const corsOptions = {
-  origin: ["http://localhost:3000", "https://cre-work-rnox.vercel.app"],
+  origin: ["http://localhost:3000", "https://www.cre-work-rnox.vercel.app", "https://cre-work-rnox.vercel.app"],
   credentials: true,
 };
 
-app.use(express.json());
-app.use(express.urlencoded());
 app.use(cookieParser());
 app.use(cors(corsOptions));
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "https://cre-work-rnox.vercel.app");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header("Access-Control-Expose-Headers", "Set-Cookie");
-  next();
-});
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 const port: number = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 
