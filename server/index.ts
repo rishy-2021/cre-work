@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import connectDB from './src/config/db';
 import taskRoutes from './src/routes/taskRoutes';
 import dotenv from 'dotenv';
+import allowCors from './src/utils/allowCors';
 
 dotenv.config();
 connectDB();
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(express.urlencoded());
 app.use(cookieParser());
 app.use(cors(corsOptions));
+app.use(allowCors);
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Credentials","true");
