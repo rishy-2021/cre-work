@@ -11,25 +11,21 @@ connectDB();
 
 const app: Application = express();
 
-const corsOptions = {
-  origin: ["http://localhost:3000", "https://www.cre-work-rnox.vercel.app", "https://cre-work-rnox.vercel.app"],
-  credentials: true,
-};
-app.use(express.json());
-app.use(express.urlencoded());
-app.use(cookieParser());
-app.use(cors(corsOptions));
-app.use(allowCors);
-app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Credentials","true");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  res.header("Access-Control-Expose-Headers", "Set-Cookie");
-  next();
-});
+// Configure CORS
+app.use(cors({
+    origin: '*', // Specify the origin or use '*' for open access
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+    credentials: true,
+    maxAge: 3600 // Define how long the results of a preflight request can be cached
+}));
 
 const port: number = process.env.PORT ? parseInt(process.env.PORT) : 3001;
+
+app.use((req, res, next) => {
+  console.log('Received request:', req.method, req.path);
+  next();
+});
 
 app.use('/api', taskRoutes);
 
