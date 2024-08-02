@@ -9,6 +9,7 @@ export const fetchTasks = async (): Promise<AddTaskInput[]> => {
       'Content-Type': 'application/json',
     },
     cache:"no-store",
+    mode: 'no-cors',
   });
   if (!response.ok) {
     throw new Error('Failed to fetch tasks');
