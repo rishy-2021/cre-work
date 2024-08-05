@@ -1,30 +1,28 @@
 import React, { FC } from "react";
-import { AddTaskInput } from "./task-mutation";
-import { DragDropContext, DropResult } from "react-beautiful-dnd";
+import { AddTaskInput, Status, Task } from "./task-mutation";
+import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import TaskBox from "./task-box";
 
 interface Props {
   onOpen: (todo: string) => void;
-  tasks: AddTaskInput[];
-  handleTaskUpdate:(updatedTasks :AddTaskInput[])=> void;
+  tasks: Task[];
+  handleTaskUpdate:(taskId:string, newStatus: Status)=> void;
 }
 
 const TaskContainer: FC<Props> = ({ onOpen, tasks, handleTaskUpdate }) => {
   const onDragEnd = (result: DropResult) => {
-    const { source, destination } = result;
+    const { destination, source, draggableId } = result;
 
-    if (!destination) return;
+    if (!destination) {
+      return;
+    }
 
-    console.log(source, destination)
+    if (destination.index === source.index && destination.droppableId === source.droppableId) {
+      return;
+    }
 
-    const updatedTasks = Array.from(tasks);
-    const [movedTask] = updatedTasks.splice(source.index, 1);
-    movedTask.status = destination.droppableId as 'To do' | 'In progress' | 'Under review' | 'Finished';
-    updatedTasks.splice(destination.index, 0, movedTask);
-
-    console.log(updatedTasks); // Replace with actual state update
-
-    handleTaskUpdate(updatedTasks);
+    // Optimistic UI update
+    handleTaskUpdate(draggableId, destination.droppableId as Status);
   };
 
   const todos = tasks.filter((task) => task.status === "To do");
@@ -34,32 +32,34 @@ const TaskContainer: FC<Props> = ({ onOpen, tasks, handleTaskUpdate }) => {
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex flex-wrap justify-between items-start bg-white p-4 mt-4 mr-4 rounded-lg">
+      {
+      tasks && <div className="flex flex-wrap justify-between items-start bg-white p-4 mt-4 mr-4 rounded-lg">
         <TaskBox
           onOpen={onOpen}
           tasks={todos}
-          droppableId="To do"
+          droppableId={Status.TO_DO}
           columnTitle="To do"
         />
         <TaskBox
           onOpen={onOpen}
           tasks={inProgress}
-          droppableId="In progress"
+          droppableId={Status.IN_PROGRESS}
           columnTitle="In progress"
         />
         <TaskBox
           onOpen={onOpen}
           tasks={underReview}
-          droppableId="Under review"
+          droppableId={Status.UNDER_REVIEW}
           columnTitle="Under review"
         />
         <TaskBox
           onOpen={onOpen}
           tasks={finished}
-          droppableId="Finished"
+          droppableId={Status.FINISHED}
           columnTitle="Finished"
         />
       </div>
+}
     </DragDropContext>
   );
 };

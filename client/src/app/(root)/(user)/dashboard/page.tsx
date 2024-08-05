@@ -1,10 +1,10 @@
 "use client";
 import CustomButton, { Position } from "@/components/button";
-import AddNewTask, { AddTaskInput } from "@/components/ui/dashboard/task-mutation";
+import { AddTaskInput, Status, Task } from "@/components/ui/dashboard/task-mutation";
 import CustomDrawer from "@/components/ui/dashboard/drawer";
 import FeatureBox from "@/components/ui/dashboard/feature-box";
 import TaskContainer from "@/components/ui/dashboard/task-container";
-import { Drawer, Input } from "antd";
+import { Input } from "antd";
 import React, { useEffect, useState } from "react";
 import { CiFilter } from "react-icons/ci";
 import { FaCirclePlus } from "react-icons/fa6";
@@ -13,7 +13,7 @@ import { LuCalendar } from "react-icons/lu";
 import { RiSearchLine } from "react-icons/ri";
 import { SlQuestion } from "react-icons/sl";
 import { TbAutomaticGearbox } from "react-icons/tb";
-import { fetchTasks } from "@/utils/api";
+import { apiRequest, updateTask } from "@/utils/api";
 
 const buttonActions = [
   { lebel: "Calendar", icon: <LuCalendar color="gray" size={22} /> },
@@ -47,30 +47,33 @@ const Dashboard = () => {
   const [open, setOpen] = useState(false);
   const [width, setWidth] = useState("40%");
   const [action, setAction] = useState("");
-  const [tasks, setTasks] = useState<AddTaskInput[]>([]);
-
-  const renameIdField = (arr: any[]) => {
-    return arr.map(item => {
-      const { _id, ...rest } = item;
-      return { id: _id, ...rest };
-    });
-  };
-
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const handleFetchTasks = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tasks`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        cache:"no-store",
-      });
-      setTasks(renameIdField(await response.json()));
+      const data = await apiRequest('/tasks');
+      // setTasks(renameIdField(await response.json()));
+      // console.log(response.json())
+      setTasks(data);
     } catch (error) {
       console.error("Error creating task:", error);
     }
   };
+
+  const handleTaskUpdate = async (taskId: string, newStatus: string) => {
+    console.log('Updating task status:', taskId, newStatus);
+    setTasks(prevTasks =>
+      prevTasks.map(task =>
+        task._id === taskId ? { ...task, status: newStatus } : task
+      )
+    );
+    try {
+     const data = await updateTask(taskId, {status:newStatus})
+    } catch (error) {
+      console.error('Error updating tasks:', error);
+    }
+  };
+
 
   useEffect(()=>{
     handleFetchTasks()
@@ -132,7 +135,7 @@ const Dashboard = () => {
           setAction(action);
           setOpen(true);
         }}
-        handleTaskUpdate={(updatedTasks)=>setTasks(updatedTasks)}
+        handleTaskUpdate={handleTaskUpdate}
       />
       <CustomDrawer
         open={open}

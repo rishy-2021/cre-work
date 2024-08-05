@@ -1,22 +1,21 @@
-"use client"
 import React, { FC } from "react";
-import { Droppable, Draggable } from "react-beautiful-dnd";
+import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { BsFilterRight } from "react-icons/bs";
 import { FiPlus } from "react-icons/fi";
 import CustomButton, { Position } from "@/components/button";
-import { AddTaskInput } from "./task-mutation";
+import { AddTaskInput, Status, Task } from "./task-mutation";
 import TaskBoxBody from "./task-box-body";
 
 interface Props {
   onOpen: (action: string) => void;
-  tasks: AddTaskInput[];
-  droppableId: string;
+  tasks: Task[];
+  droppableId: Status;
   columnTitle: string;
 }
 
-const TaskBox: FC<Props> = ({ onOpen, tasks, droppableId, columnTitle }) => {
+const Column: FC<Props> = ({ onOpen, tasks, droppableId, columnTitle }) => {
   return (
-    <Droppable droppableId={droppableId}>
+    <Droppable droppableId={droppableId} type="group">
       {(provided) => (
         <div
           ref={provided.innerRef}
@@ -28,7 +27,7 @@ const TaskBox: FC<Props> = ({ onOpen, tasks, droppableId, columnTitle }) => {
             <BsFilterRight size={24} />
           </div>
           {tasks.map((task, idx) => (
-            <Draggable key={Number(idx)} draggableId={task?._id || ''} index={idx}>
+            <Draggable key={task._id} draggableId={task._id} index={idx}>
               {(provided, snapshot) => (
                 <div
                   ref={provided.innerRef}
@@ -42,7 +41,7 @@ const TaskBox: FC<Props> = ({ onOpen, tasks, droppableId, columnTitle }) => {
             </Draggable>
           ))}
           {provided.placeholder}
-          {/* <CustomButton
+          <CustomButton
             iconPosition={Position.END}
             title="Add new"
             icon={<FiPlus color="white" size={22} />}
@@ -50,11 +49,11 @@ const TaskBox: FC<Props> = ({ onOpen, tasks, droppableId, columnTitle }) => {
             customStyles="w-full h-10 flex justify-between"
             color="white"
             onClick={() => onOpen(columnTitle)}
-          /> */}
+          />
         </div>
       )}
     </Droppable>
   );
 };
 
-export default TaskBox;
+export default Column;

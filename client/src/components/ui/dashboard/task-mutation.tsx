@@ -64,7 +64,16 @@ interface CustomProperties {
 }
 
 export interface AddTaskInput {
-  _id?:string;
+  title: string;
+  status: string;
+  priority?: string;
+  deadline: string;
+  description?: string;
+  customProperties?: CustomProperties[];
+}
+
+export interface Task {
+  _id:string;
   title: string;
   status: string;
   priority?: string;
@@ -74,6 +83,7 @@ export interface AddTaskInput {
 }
 
 export const addTaskInput: AddTaskInput = {
+
   title: "",
   status: "",
   priority: "",

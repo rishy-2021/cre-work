@@ -6,7 +6,7 @@ type Handler = (req: IncomingMessage, res: ServerResponse) => Promise<void> | vo
 // Create a CORS-enabled function wrapper
 const allowCors = (fn: Handler): Handler => async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Origin', '');
   // You could also set this to a specific origin:
   // res.setHeader('Access-Control-Allow-Origin', req.headers.origin);
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');

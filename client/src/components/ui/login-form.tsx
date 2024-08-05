@@ -1,11 +1,9 @@
 "use client";
-import styles from "@/styles/signup.module.css";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { LoginFormData } from "@/types/auth/types";
 import { useState } from "react";
-import FieldErrorText from "../FieldErrorText";
 import { Button, Input } from "antd";
 import Link from "next/link";
 import { ZodType, z } from "zod";
