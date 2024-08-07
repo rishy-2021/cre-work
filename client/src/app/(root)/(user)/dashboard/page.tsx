@@ -13,7 +13,7 @@ import { LuCalendar } from "react-icons/lu";
 import { RiSearchLine } from "react-icons/ri";
 import { SlQuestion } from "react-icons/sl";
 import { TbAutomaticGearbox } from "react-icons/tb";
-import { apiRequest, updateTask } from "@/utils/api";
+import { fetchtasks, updateTask } from "@/utils/api";
 
 const buttonActions = [
   { lebel: "Calendar", icon: <LuCalendar color="gray" size={22} /> },
@@ -51,7 +51,7 @@ const Dashboard = () => {
 
   const handleFetchTasks = async () => {
     try {
-      const data = await apiRequest('/tasks');
+      const data = await fetchtasks();
       // setTasks(renameIdField(await response.json()));
       // console.log(response.json())
       setTasks(data);
