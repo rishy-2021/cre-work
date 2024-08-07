@@ -8,7 +8,7 @@ export const fetchtasks = async () => {
       method:"GET",
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmFiZWE5NWIwZGRhYmFlNDY0MzVlYjQiLCJpYXQiOjE3MjI3NTc5MDEsImV4cCI6MTcyMjc2MTUwMX0.2xgqK5p_brY_WogBz52W0xiKOobPXElrFNgSAH9REus`
+        // Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2NmFiZWE5NWIwZGRhYmFlNDY0MzVlYjQiLCJpYXQiOjE3MjI3NTc5MDEsImV4cCI6MTcyMjc2MTUwMX0.2xgqK5p_brY_WogBz52W0xiKOobPXElrFNgSAH9REus`
       }
     });
 
