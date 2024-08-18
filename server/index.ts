@@ -8,7 +8,7 @@ require("dotenv").config();
 dotenv.config();
 connectDB();
 
-const allowedOrigins = ['http://localhost:3000' , 'https://twello-clone-frontend.vercel.app'];
+const allowedOrigins = ['http://localhost:3000' , 'https://cre-work-rnox.vercel.app'];
 const app = express();
 
 
