@@ -4,7 +4,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export const fetchtasks = async () => {
   try {
-    const response = await fetch(`${API_URL}/api/tasks`, {
+    const response = await fetch(`https://cre-work-9a4ze1qdk-rishys-projects.vercel.app/api/tasks`, {
       method:"GET",
       headers: {
         'Content-Type': 'application/json',
