@@ -1,6 +1,6 @@
 "use client";
 import CustomButton, { Position } from "@/components/button";
-import { AddTaskInput, Status, Task } from "@/components/ui/dashboard/task-mutation";
+import { Task } from "@/components/ui/dashboard/task-mutation";
 import CustomDrawer from "@/components/ui/dashboard/drawer";
 import FeatureBox from "@/components/ui/dashboard/feature-box";
 import TaskContainer from "@/components/ui/dashboard/task-container";
@@ -14,6 +14,76 @@ import { RiSearchLine } from "react-icons/ri";
 import { SlQuestion } from "react-icons/sl";
 import { TbAutomaticGearbox } from "react-icons/tb";
 import { fetchtasks, updateTask } from "@/utils/api";
+
+const dummyTasks = [
+  {
+    _id: "66aa2fe814ad8243e6fcc288",
+    title: "Implement Authentication",
+    status: "To do",
+    priority: "Medium",
+    deadline: "2024-07-19T18:30:00.000Z",
+    description: "Implement email authentication with luica auth or clerk",
+    customProperties: [],
+  },
+  {
+    _id: "66aa2fe814ad827892819cc288",
+    title: "Add Task Form",
+    status: "Finished",
+    priority: "High",
+    deadline: "2024-07-17T19:30:00.000Z",
+    description: "Create a form which have field to create tasks",
+    customProperties: [],
+  },
+  {
+    _id: "66aa2fe814ad8243e6fcc289",
+    title: "Design User Dashboard",
+    status: "In progress",
+    priority: "High",
+    deadline: "2024-08-25T17:00:00.000Z",
+    description:
+      "Create a responsive user dashboard with charts and statistics",
+    customProperties: [],
+  },
+  {
+    _id: "66aa2fe814ad8243e6fcc290",
+    title: "Optimize Database Queries",
+    status: "To do",
+    priority: "Medium",
+    deadline: "2024-08-20T18:30:00.000Z",
+    description:
+      "Improve the performance of database queries by indexing and caching",
+    customProperties: [],
+  },
+  {
+    _id: "66aa2fe814ad8243e6fcc291",
+    title: "Write Unit Tests for API",
+    status: "To do",
+    priority: "High",
+    deadline: "2024-08-22T16:00:00.000Z",
+    description:
+      "Write unit tests for all the API endpoints to ensure reliability",
+    customProperties: [],
+  },
+  {
+    _id: "66aa2fe814ad8243e6fcc292",
+    title: "Deploy Application to Production",
+    status: "In progress",
+    priority: "High",
+    deadline: "2024-08-18T14:00:00.000Z",
+    description:
+      "Deploy the latest version of the application to the production environment",
+    customProperties: [],
+  },
+  {
+    _id: "66aa2fe814ad8243e6fcc293",
+    title: "Update Documentation",
+    status: "Under review",
+    priority: "Low",
+    deadline: "2024-08-15T12:00:00.000Z",
+    description: "Update the project documentation to reflect recent changes",
+    customProperties: [],
+  },
+];
 
 const buttonActions = [
   { lebel: "Calendar", icon: <LuCalendar color="gray" size={22} /> },
@@ -52,32 +122,31 @@ const Dashboard = () => {
   const handleFetchTasks = async () => {
     try {
       const data = await fetchtasks();
-      // setTasks(renameIdField(await response.json()));
-      // console.log(response.json())
-      setTasks(data);
+      if (data) {
+        setTasks(data);
+      }
     } catch (error) {
       console.error("Error creating task:", error);
     }
   };
 
   const handleTaskUpdate = async (taskId: string, newStatus: string) => {
-    console.log('Updating task status:', taskId, newStatus);
-    setTasks(prevTasks =>
-      prevTasks.map(task =>
+    console.log("Updating task status:", taskId, newStatus);
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
         task._id === taskId ? { ...task, status: newStatus } : task
       )
     );
     try {
-     const data = await updateTask(taskId, {status:newStatus})
+      const data = await updateTask(taskId, { status: newStatus });
     } catch (error) {
-      console.error('Error updating tasks:', error);
+      console.error("Error updating tasks:", error);
     }
   };
 
-
-  useEffect(()=>{
-    handleFetchTasks()
-  },[])
+  useEffect(() => {
+    handleFetchTasks();
+  }, []);
 
   return (
     <div className="bg-[#F7F7F7] h-screen w-full py-5 px-4">
@@ -141,8 +210,8 @@ const Dashboard = () => {
         open={open}
         width={width}
         onClose={() => {
-          setOpen(false)
-          handleFetchTasks()
+          setOpen(false);
+          handleFetchTasks();
         }}
         onWidthChange={(width) => setWidth(width)}
         action={action}

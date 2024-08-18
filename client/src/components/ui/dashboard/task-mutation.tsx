@@ -5,7 +5,6 @@ import CustomButton, { Position } from "@/components/button";
 import { GoShareAndroid } from "react-icons/go";
 import { FaRegStar } from "react-icons/fa6";
 import {
-  MdDelete,
   MdOutlineCreateNewFolder,
   MdOutlineDashboardCustomize,
   MdOutlineZoomOutMap,

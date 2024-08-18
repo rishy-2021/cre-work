@@ -4,13 +4,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 export const fetchtasks = async () => {
   try {
-    const response = await fetch(`https://cre-work-9a4ze1qdk-rishys-projects.vercel.app/api/tasks`, {
+    const response = await fetch(`${API_URL}/api/task`, {
       method:"GET",
       headers: {
         'Content-Type': 'application/json',
       },
       cache:"no-store",
-      mode: 'no-cors',
     });
 
     if (!response.ok) {
@@ -27,7 +26,7 @@ export const fetchtasks = async () => {
 };
 export const createTask = async (task: Partial<AddTaskInput>): Promise<AddTaskInput> => {
   console.log(task, "-----------")
-  const response = await fetch(`${API_URL}/api/tasks/add`, {
+  const response = await fetch(`${API_URL}/api/task/add`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -43,7 +42,7 @@ export const createTask = async (task: Partial<AddTaskInput>): Promise<AddTaskIn
 };
 
 export const updateTask = async (id: string, task: Partial<AddTaskInput>): Promise<AddTaskInput> => {
-  const response = await fetch(`${API_URL}/api/tasks/${id}`, {
+  const response = await fetch(`${API_URL}/api/task/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
@@ -57,8 +56,11 @@ export const updateTask = async (id: string, task: Partial<AddTaskInput>): Promi
 };
 
 export const deleteTask = async (id: string): Promise<void> => {
-  const response = await fetch(`${API_URL}/api/tasks/${id}`, {
+  const response = await fetch(`${API_URL}/api/task/${id}`, {
     method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
   if (!response.ok) {
     throw new Error('Failed to delete task');

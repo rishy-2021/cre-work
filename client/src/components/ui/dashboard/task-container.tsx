@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { AddTaskInput, Status, Task } from "./task-mutation";
+import { Status, Task } from "./task-mutation";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import TaskBox from "./task-box";
 
