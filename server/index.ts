@@ -1,31 +1,37 @@
-import express, { Application } from 'express';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import connectDB from './src/config/db';
-import taskRoutes from './src/routes/taskRoutes';
+import express from "express";
+import cors from "cors";
+import taskRoutes from "./src/routes/taskRoutes";
 import dotenv from 'dotenv';
-import allowCors from './src/utils/allowCors';
+import connectDB from "./src/config/db";
 
+require("dotenv").config();
 dotenv.config();
 connectDB();
 
-const app: Application = express();
+const allowedOrigins = ['http://localhost:3000' , 'https://twello-clone-frontend.vercel.app'];
+const app = express();
 
-// Configure CORS
+
 app.use(cors({
-    origin: '*', // Specify the origin or use '*' for open access
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-    credentials: true,
-    maxAge: 3600 // Define how long the results of a preflight request can be cached
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
+
+app.options('*', cors({
+    origin: allowedOrigins,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
 }));
 
 const port: number = process.env.PORT ? parseInt(process.env.PORT) : 3001;
 
-app.use((req, res, next) => {
-  console.log('Received request:', req.method, req.path);
-  next();
-});
+app.use(express.json());
+
+app.listen(5000);
+
+module.exports = app;
 
 app.use('/api', taskRoutes);
 
