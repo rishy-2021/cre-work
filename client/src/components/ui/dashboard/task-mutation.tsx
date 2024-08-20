@@ -19,15 +19,16 @@ import TextArea from "antd/es/input/TextArea";
 import { z } from "zod";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createTask } from "@/utils/api";
+import { createTask, updateTask } from "@/utils/api";
 import DatePicker from "./date-picker";
-import { DateTime } from 'luxon';
+import { DateTime } from "luxon";
 import { FiDelete } from "react-icons/fi";
 
 interface Props {
   onClose: () => void;
   onChangeWidth: (width: string) => void;
   taskStatus?: string;
+  task?: Task;
 }
 
 const priority = [
@@ -72,7 +73,7 @@ export interface AddTaskInput {
 }
 
 export interface Task {
-  _id:string;
+  _id: string;
   title: string;
   status: string;
   priority?: string;
@@ -82,7 +83,6 @@ export interface Task {
 }
 
 export const addTaskInput: AddTaskInput = {
-
   title: "",
   status: "",
   priority: "",
@@ -91,7 +91,12 @@ export const addTaskInput: AddTaskInput = {
   customProperties: [],
 };
 
-const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
+const TaskMutation: FC<Props> = ({
+  onClose,
+  onChangeWidth,
+  taskStatus,
+  task,
+}) => {
   const [isZoomOut, setZoomOut] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -108,9 +113,8 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
       .refine((val) => val !== null, {
         message: "Status cannot be null",
       }),
-    priority: z
-      .nativeEnum(Priority).optional(),
-    deadline: z.string().min(1,{message:"Required*"}),
+    priority: z.nativeEnum(Priority).optional(),
+    deadline: z.string().min(1, { message: "Required*" }),
     description: z.string().optional(),
     customProperties: z.array(customPropertyValidationSchema).optional(),
   });
@@ -124,7 +128,6 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
     control,
     setValue,
     handleSubmit,
-    formState: { isDirty, errors },
     reset,
   } = form;
   const taskCustomProperties = useFieldArray({
@@ -133,12 +136,23 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
   });
 
   const onSubmit = async (formData: AddTaskInput) => {
+    console.log(formData);
+
     setIsLoading(true);
     try {
-      const newTask = await createTask(formData);
-      if (newTask) {
-        onClose();
-        reset({});
+      if (!task) {
+        const newTask = await createTask(formData);
+        if (newTask) {
+          onClose();
+          reset({});
+        }
+      } else {
+        const { mutatedTask } = await updateTask(task._id, formData);
+
+        if (mutatedTask) {
+          onClose();
+          reset(mutatedTask);
+        }
       }
     } catch (error) {
       console.error("Error creating task:", error);
@@ -151,6 +165,9 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
   useEffect(() => {
     if (taskStatus) {
       reset({ ...addTaskInput, status: taskStatus });
+    }
+    if (task) {
+      reset(task);
     }
   }, []);
 
@@ -396,7 +413,12 @@ const TaskMutation: FC<Props> = ({ onClose, onChangeWidth, taskStatus }) => {
               }}
               name={`customProperties.${index}.value`}
             />
-            <Button icon={<AiOutlineDelete />} className="ml-5" size="small" onClick={()=> taskCustomProperties.remove(index)} />
+            <Button
+              icon={<AiOutlineDelete />}
+              className="ml-5"
+              size="small"
+              onClick={() => taskCustomProperties.remove(index)}
+            />
           </div>
         ))}
         <div

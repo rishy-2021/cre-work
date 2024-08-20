@@ -1,10 +1,10 @@
 import React, { FC } from "react";
-import { Status, Task } from "./task-mutation";
+import { AddTaskInput, Status, Task } from "./task-mutation";
 import { DragDropContext, DropResult } from "@hello-pangea/dnd";
 import TaskBox from "./task-box";
 
 interface Props {
-  onOpen: (todo: string) => void;
+  onOpen: (todo: string, task?:Task) => void;
   tasks: Task[];
   handleTaskUpdate:(taskId:string, newStatus: Status)=> void;
 }

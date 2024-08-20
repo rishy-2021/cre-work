@@ -1,5 +1,5 @@
 "use client";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { SignupFormData } from "@/types/auth/types";
@@ -8,30 +8,37 @@ import FieldErrorText from "../FieldErrorText";
 import { Button, Input } from "antd";
 import Link from "next/link";
 import { ZodType, z } from "zod";
+import { signUp } from "@/utils/api";
 
-const signUpSchema: ZodType<SignupFormData> = z
-  .object({
-    name:z.string().min(2, "Please enter a vaild name"),
-    email: z.string().email(),
-    password: z.string().min(8, "Password must contain at least 8 characters").max(128)
-  });
+const signUpSchema: ZodType<SignupFormData> = z.object({
+  username: z.string().min(2, "Please enter a vaild name"),
+  email: z.string().email(),
+  password: z
+    .string()
+    .min(8, "Password must contain at least 8 characters")
+    .max(128),
+});
 
 const SignUpForm = () => {
   const {
     register,
     handleSubmit,
+    control,
     formState: { isValid, errors },
   } = useForm<SignupFormData>({ resolver: zodResolver(signUpSchema) });
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const [passwordShow, setPasswordShow] = useState(false);
-
-  const handleClick = () => {
-    setPasswordShow(!passwordShow);
+  const submitData = async (formdata: SignupFormData) => {
+    setIsLoading(true);
+    const { token, username } = await signUp(formdata);
+    if (token) {
+      localStorage.setItem("token", token);
+      localStorage.setItem("username", username);
+      router.push("dashboard");
+    }
+    setIsLoading(false);
   };
-
-  const submitData = async (formdata: SignupFormData) => {};
 
   return (
     <form
@@ -44,37 +51,98 @@ const SignUpForm = () => {
         </p>
       </div>
       <div className="inputs flex flex-col gap-y-3">
-        <Input
-          type="fullName"
-          {...register("name")}
-          placeholder="Your Email"
-          size={"large"}
-          className="bg-gray-100 mb-2"
+        <Controller
+          control={control}
+          render={({ field: { onChange, value }, fieldState: { error } }) => {
+            return (
+              <>
+                <Input
+                  type="fullName"
+                  {...register("username")}
+                  placeholder="Your Name"
+                  size={"large"}
+                  className="bg-gray-100 mb-2"
+                  status={errors.username && "error"}
+                  onChange={onChange}
+                  value={value}
+                  suffix={
+                    error && (
+                      <p
+                        className={
+                          "flex text-sm items-start justify-start h-full px-1 text-red-600"
+                        }
+                      >
+                        Required*
+                      </p>
+                    )
+                  }
+                />
+              </>
+            );
+          }}
+          name="username"
         />
-        {errors.email && (
-          <FieldErrorText>{errors.email.message}</FieldErrorText>
-        )}
-        <Input
-          type="email"
-          {...register("email")}
-          placeholder="Your Email"
-          size={"large"}
-          className="bg-gray-100 mb-2"
+        <Controller
+          control={control}
+          render={({ field: { onChange, value }, fieldState: { error } }) => {
+            return (
+              <>
+                <Input
+                  type="email"
+                  {...register("email")}
+                  placeholder="Your Email"
+                  size={"large"}
+                  className="bg-gray-100 mb-2"
+                  status={errors.email && "error"}
+                  onChange={onChange}
+                  value={value}
+                  suffix={
+                    error && (
+                      <p
+                        className={
+                          "flex text-sm items-start justify-start h-full px-1 text-red-600"
+                        }
+                      >
+                        Required*
+                      </p>
+                    )
+                  }
+                />
+              </>
+            );
+          }}
+          name="email"
         />
-        {errors.email && (
-          <FieldErrorText>{errors.email.message}</FieldErrorText>
-        )}
-        <Input
-          type="password"
-          {...register("password")}
-          placeholder="Password"
-          size={"large"}
-          className="bg-gray-100"
+        <Controller
+          control={control}
+          render={({ field: { onChange, value }, fieldState: { error } }) => {
+            return (
+              <>
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  size={"large"}
+                  className="bg-gray-100"
+                  status={error && "error"}
+                  onChange={onChange}
+                  value={value}
+                  suffix={
+                    error && (
+                      <p
+                        className={
+                          "flex text-sm items-start justify-start h-full px-1 text-red-600"
+                        }
+                      >
+                        Required*
+                      </p>
+                    )
+                  }
+                />
+              </>
+            );
+          }}
+          name="password"
         />
-        {errors.password && (
-          <FieldErrorText>{errors.password.message}</FieldErrorText>
-        )}
-
         <div className="flex items-center justify-between">
           <Button
             loading={isLoading}
@@ -86,14 +154,17 @@ const SignUpForm = () => {
               background: `linear-gradient(180deg, #4C38C2 0%, #2F2188 100%),
               linear-gradient(0deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.3))`,
             }}
-            onClick={handleSubmit(()=>router.push("/dashboard"))}
+            onClick={handleSubmit(submitData)}
           >
             Sign up
           </Button>
         </div>
         <p className="mx-auto text-sm mt-2">
           Already have an account?
-          <span className="text-violet-700"><Link href={"/login"}> Log in</Link></span>.
+          <span className="text-violet-700">
+            <Link href={"/login"}> Log in</Link>
+          </span>
+          .
         </p>
       </div>
     </form>

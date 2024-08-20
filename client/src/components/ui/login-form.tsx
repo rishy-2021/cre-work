@@ -7,8 +7,9 @@ import { useState } from "react";
 import { Button, Input } from "antd";
 import Link from "next/link";
 import { ZodType, z } from "zod";
+import { signIn } from "@/utils/api";
 
-const LoginForm = ({ toast }: any) => {
+const LoginForm = () => {
 
   const loginSchema: ZodType<LoginFormData> = z
   .object({
@@ -19,17 +20,19 @@ const LoginForm = ({ toast }: any) => {
     register,
     handleSubmit,
     control,
-    formState: { isValid, errors },
   } = useForm<LoginFormData>({ resolver: zodResolver(loginSchema) });
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [passwordShow, setPasswordShow] = useState(false);
 
-  const handleClick = () => {
-    setPasswordShow(!passwordShow);
+  const submitData = async (formdata: LoginFormData) => {
+    setIsLoading(true)
+    const {token, username} = await signIn(formdata);
+    if(token && username) {
+      localStorage.setItem("token", token);
+      localStorage.setItem("username", username);
+    }
+    setIsLoading(false)
   };
-
-  const submitData = async (formdata: LoginFormData) => {};
 
   return (
     <form

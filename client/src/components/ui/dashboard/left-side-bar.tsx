@@ -11,7 +11,7 @@ import CustomButton, { Position } from "@/components/button";
 import { FaCirclePlus } from "react-icons/fa6";
 import { LiaDownloadSolid } from "react-icons/lia";
 import CustomDrawer from "./drawer";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const tabs = [
   { name: "Home", icon: <HiOutlineHome size={23} color="gray" /> },
@@ -26,12 +26,21 @@ const LeftSideBar = () => {
   const [width, setWidth] = useState("40%");
   const [action, setAction] = useState("");
 
+  const [storedData, setStoredData] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const data = localStorage.getItem('username');
+      setStoredData(data);
+    }
+  }, []);
+
   return (
     <div className="flex flex-col justify-between w-80 h-screen pt-8 px-5 border-r-2">
       <div>
         <div className="flex justify-start items-center">
           <Image src={profile} alt="" className="w-8 h-8 rounded-lg mr-3" />
-          <p className="text-[21px] font-medium">Joe gardener</p>
+          <p className="text-[21px] font-medium">{storedData}</p>
         </div>
         <div className="flex justify-between items-center my-5">
           <div className="w-2/5 flex justify-between items-center">

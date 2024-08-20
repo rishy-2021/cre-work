@@ -3,11 +3,11 @@ import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { BsFilterRight } from "react-icons/bs";
 import { FiPlus } from "react-icons/fi";
 import CustomButton, { Position } from "@/components/button";
-import { AddTaskInput, Status, Task } from "./task-mutation";
+import {AddTaskInput, Status, Task } from "./task-mutation";
 import TaskBoxBody from "./task-box-body";
 
 interface Props {
-  onOpen: (action: string) => void;
+  onOpen: (action: string, task?: Task) => void;
   tasks: Task[];
   droppableId: Status;
   columnTitle: string;
@@ -35,7 +35,7 @@ const Column: FC<Props> = ({ onOpen, tasks, droppableId, columnTitle }) => {
                   {...provided.dragHandleProps}
                   className={`mb-2 p-2 bg-white rounded shadow-sm ${snapshot.isDragging ? 'bg-gray-200' : ''}`}
                 >
-                  <TaskBoxBody task={task} />
+                  <TaskBoxBody task={task}  onTaskMutation={(task, action) => action ==="delete" ? onOpen(action, task) : onOpen(columnTitle, task) }/>
                 </div>
               )}
             </Draggable>

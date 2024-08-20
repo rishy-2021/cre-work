@@ -1,11 +1,13 @@
-import { Tag } from "antd";
+import { Button, Tag } from "antd";
 import React, { FC } from "react";
-import { MdOutlineAccessTime } from "react-icons/md";
-import { AddTaskInput } from "./task-mutation";
+import { MdDelete, MdEdit, MdOutlineAccessTime } from "react-icons/md";
+import { AddTaskInput, Task } from "./task-mutation";
 import { DateTime } from "luxon";
+import { deleteTask } from "@/utils/api";
 
 interface Props {
-  task:AddTaskInput
+  task:Task
+  onTaskMutation:(task: Task, action?: string)=> void;
 }
 
 const priorityColors = {
@@ -14,7 +16,12 @@ const priorityColors = {
   Low: "#0ECC5A"
 }
 
-const TaskBoxBody:FC<Props> = ({task}) => {
+const TaskBoxBody:FC<Props> = ({task, onTaskMutation}) => {
+
+  const handleDeleteTask  = async () => {
+     await deleteTask(task._id)
+      onTaskMutation(task, "delete")
+  }
   return (
     <div className="flex flex-col border bg-[#F9F9F9] rounded-lg justify-center items-start p-4 mb-4">
       <p className="text-base font-medium text-[#606060]">
@@ -28,7 +35,17 @@ const TaskBoxBody:FC<Props> = ({task}) => {
       <MdOutlineAccessTime size={22}/>
         <p className={`ml-2`}>{task.deadline && DateTime.fromISO(task.deadline).toLocaleString()}</p>
       </div>}
-      <p className="text-sm text-[#797979] ml-1.5 mt-3">1 hr ago</p>
+      <div className="flex flex-row items-center justify-between w-full mt-3">
+      <p className="text-sm text-[#797979] ml-1.5">1 hr ago</p>
+      <div className="">
+        <button className="mr-2.5" onClick={()=> handleDeleteTask()}>
+        <MdDelete color="orange" size={20} />
+        </button>
+        <button onClick={()=>onTaskMutation(task)}>
+        <MdEdit size={19} color="#4C38C2" />
+        </button>
+      </div>
+      </div>
     </div>
   );
 };

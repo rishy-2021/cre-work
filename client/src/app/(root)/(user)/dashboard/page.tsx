@@ -118,6 +118,8 @@ const Dashboard = () => {
   const [width, setWidth] = useState("40%");
   const [action, setAction] = useState("");
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [storedData, setStoredData] = useState<string | null>(null);
+  const [mutationTask, setMutationTask] = useState<Task>();
 
   const handleFetchTasks = async () => {
     try {
@@ -138,7 +140,7 @@ const Dashboard = () => {
       )
     );
     try {
-      const data = await updateTask(taskId, { status: newStatus });
+      await updateTask(taskId, { status: newStatus });
     } catch (error) {
       console.error("Error updating tasks:", error);
     }
@@ -148,11 +150,18 @@ const Dashboard = () => {
     handleFetchTasks();
   }, []);
 
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const data = localStorage.getItem('username');
+      setStoredData(data);
+    }
+  }, []);
+
   return (
     <div className="bg-[#F7F7F7] h-screen w-full py-5 px-4">
       <div className="flex items-center justify-between py-2 pr-3">
         <p className="text-5xl font-semibold text-[#080808]">
-          Good morning, Joe!
+          Good morning, {storedData}
         </p>
         <div className="flex items-center">
           <p className="mr-2">Help & feedback</p>
@@ -200,9 +209,14 @@ const Dashboard = () => {
       </div>
       <TaskContainer
         tasks={tasks}
-        onOpen={(action) => {
-          setAction(action);
-          setOpen(true);
+        onOpen={(action, task) => {
+          if(action === "delete"){
+            handleFetchTasks()
+          } else{
+            setAction(action);
+            setMutationTask(task);
+            setOpen(true);
+          }
         }}
         handleTaskUpdate={handleTaskUpdate}
       />
@@ -216,6 +230,7 @@ const Dashboard = () => {
         onWidthChange={(width) => setWidth(width)}
         action={action}
         key={action}
+        task={mutationTask}
       />
     </div>
   );
